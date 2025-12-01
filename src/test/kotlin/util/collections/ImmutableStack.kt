@@ -1,7 +1,9 @@
 package util.collections
 
 @Suppress("unused")
-data class ImmutableStack<T>(private val elements: List<T> = emptyList()) {
+data class ImmutableStack<T>(
+    private val elements: List<T> = emptyList(),
+) {
     fun push(element: T): ImmutableStack<T> = ImmutableStack(elements + element)
 
     fun pop(): ImmutableStack<T> {

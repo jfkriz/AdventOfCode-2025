@@ -9,7 +9,9 @@ import java.util.LinkedList
 import java.util.Queue
 
 @Suppress("MemberVisibilityCanBePrivate")
-open class Matrix<T>(initialContents: List<List<T>>) : Iterable<List<T>> {
+open class Matrix<T>(
+    initialContents: List<List<T>>,
+) : Iterable<List<T>> {
     private var grid: MutableList<MutableList<T>> =
         validate(initialContents).map { it.map { r -> r }.toMutableList() }.toMutableList()
 
@@ -48,14 +50,18 @@ open class Matrix<T>(initialContents: List<List<T>>) : Iterable<List<T>> {
         includeDiagonal: Boolean = false,
         pointFilter: (currentPoint: DataPoint<T>, neighboringPoint: DataPoint<T>) -> Boolean = { _, _ -> true },
     ): Map<Direction, DataPoint<T>> =
-        Direction.entries.filter { includeDiagonal || !it.diagonal }.filter {
-            (row + it.yOffset < height) && (row + it.yOffset >= 0) &&
-                (col + it.xOffset < width) && (col + it.xOffset >= 0)
-        }.associateWith {
-            pointAt(row + it.yOffset, col + it.xOffset)
-        }.filter {
-            pointFilter(pointAt(row, col), it.value)
-        }
+        Direction.entries
+            .filter { includeDiagonal || !it.diagonal }
+            .filter {
+                (row + it.yOffset < height) &&
+                    (row + it.yOffset >= 0) &&
+                    (col + it.xOffset < width) &&
+                    (col + it.xOffset >= 0)
+            }.associateWith {
+                pointAt(row + it.yOffset, col + it.xOffset)
+            }.filter {
+                pointFilter(pointAt(row, col), it.value)
+            }
 
     /**
      * A Breadth-first search to find distances from any point in the matrix to the given end point. This will return a map with the key
@@ -107,14 +113,22 @@ open class Matrix<T>(initialContents: List<List<T>>) : Iterable<List<T>> {
         end: DataPoint<T>,
         allowDiagonal: Boolean = false,
         pointFilter: (currentPoint: DataPoint<T>, neighboringPoint: DataPoint<T>) -> Boolean = { _, _ -> true },
-    ) = findAllPaths(end, allowDiagonal, pointFilter).filter { it.key == start }.ifEmpty { emptyMap() }.values.first()
+    ) = findAllPaths(end, allowDiagonal, pointFilter)
+        .filter { it.key == start }
+        .ifEmpty { emptyMap() }
+        .values
+        .first()
 
     fun findLongestPath(
         start: DataPoint<T>,
         end: DataPoint<T>,
         allowDiagonal: Boolean = false,
         pointFilter: (currentPoint: DataPoint<T>, neighboringPoint: DataPoint<T>) -> Boolean = { _, _ -> true },
-    ) = findAllPaths(end, allowDiagonal, pointFilter).filter { it.key == start }.ifEmpty { emptyMap() }.values.last()
+    ) = findAllPaths(end, allowDiagonal, pointFilter)
+        .filter { it.key == start }
+        .ifEmpty { emptyMap() }
+        .values
+        .last()
 
     /**
      * Turn this matrix on it's side, and return the new representation. By transposing, the first row becomes the first column,
@@ -150,10 +164,11 @@ open class Matrix<T>(initialContents: List<List<T>>) : Iterable<List<T>> {
         }
 
         grid =
-            transposed.map {
-                @Suppress("UNCHECKED_CAST")
-                it.toMutableList() as MutableList<T>
-            }.toMutableList()
+            transposed
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.toMutableList() as MutableList<T>
+                }.toMutableList()
         return this
     }
 
@@ -209,23 +224,24 @@ open class Matrix<T>(initialContents: List<List<T>>) : Iterable<List<T>> {
         col: Int,
     ): DataPoint<T> = DataPoint(col, row, grid[row][col])
 
-    fun find(pointFilter: (currentPoint: T) -> Boolean): List<DataPoint<T>> {
-        return grid.mapIndexed { y, row ->
-            row.mapIndexedNotNull { x, t ->
-                if (pointFilter(t)) {
-                    DataPoint(x, y, t)
-                } else {
-                    null
+    fun find(pointFilter: (currentPoint: T) -> Boolean): List<DataPoint<T>> =
+        grid
+            .mapIndexed { y, row ->
+                row.mapIndexedNotNull { x, t ->
+                    if (pointFilter(t)) {
+                        DataPoint(x, y, t)
+                    } else {
+                        null
+                    }
                 }
-            }
-        }.flatten()
-    }
+            }.flatten()
 
-    fun points(): Set<DataPoint<T>> {
-        return grid.mapIndexed { y, row ->
-            row.mapIndexed { x, t -> DataPoint(x, y, t) }
-        }.flatten().toSet()
-    }
+    fun points(): Set<DataPoint<T>> =
+        grid
+            .mapIndexed { y, row ->
+                row.mapIndexed { x, t -> DataPoint(x, y, t) }
+            }.flatten()
+            .toSet()
 
     fun setPoint(
         row: Int,
@@ -258,42 +274,39 @@ open class Matrix<T>(initialContents: List<List<T>>) : Iterable<List<T>> {
 
         val start = pointAt(row, col)
 
-        return (col - distance - 1 toward col + distance).map { y ->
-            (row - distance - 1 toward row + distance).mapNotNull { x ->
-                val next =
-                    if (isValidPoint(y, x)) {
-                        pointAt(y, x)
-                    } else if (includeOffGrid) {
-                        DataPoint<T>(x, y, fill!!)
+        return (col - distance - 1 toward col + distance)
+            .map { y ->
+                (row - distance - 1 toward row + distance).mapNotNull { x ->
+                    val next =
+                        if (isValidPoint(y, x)) {
+                            pointAt(y, x)
+                        } else if (includeOffGrid) {
+                            DataPoint<T>(x, y, fill!!)
+                        } else {
+                            null
+                        }
+
+                    if (next != null && start.distanceFrom(next) <= distance && next != start) {
+                        next
                     } else {
                         null
                     }
-
-                if (next != null && start.distanceFrom(next) <= distance && next != start) {
-                    next
-                } else {
-                    null
                 }
-            }
-        }.flatten()
+            }.flatten()
     }
 
     override fun iterator() = grid.iterator()
 
-    override fun equals(other: Any?): Boolean {
-        return other != null && this::class == other::class && this.grid == (other as Matrix<*>).grid
-    }
+    override fun equals(other: Any?): Boolean = other != null && this::class == other::class && this.grid == (other as Matrix<*>).grid
 
-    override fun hashCode(): Int {
-        return grid.hashCode()
-    }
+    override fun hashCode(): Int = grid.hashCode()
 
-    override fun toString(): String {
-        return grid.joinToString("\n") { row -> row.joinToString("") }
-    }
+    override fun toString(): String = grid.joinToString("\n") { row -> row.joinToString("") }
 }
 
-internal data class Path<T>(val start: DataPoint<T>) : Cloneable {
+internal data class Path<T>(
+    val start: DataPoint<T>,
+) : Cloneable {
     private val _points = linkedSetOf(start)
 
     val points: List<DataPoint<T>>
