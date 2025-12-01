@@ -4,21 +4,26 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+// Set to true to import Z3 native libraries for Day 24 of 2023 (or any others that may need it)
+val importZ3NativeLibs = false
+
 plugins {
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.2.21"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
-    kotlin("plugin.serialization") version "2.1.0"
+    kotlin("plugin.serialization") version "2.2.21"
     application
 }
 
 repositories {
     mavenCentral()
     // 2023 Day 24. I cheated here...
-    maven {
-        url = uri("https://artifacts.itemis.cloud/repository/maven-mps/")
-    }
-    maven {
-        url = uri("https://projects.itemis.de/nexus/content/repositories/OS/")
+    if (importZ3NativeLibs) {
+        maven {
+            url = uri("https://artifacts.itemis.cloud/repository/maven-mps/")
+        }
+        maven {
+            url = uri("https://projects.itemis.de/nexus/content/repositories/OS/")
+        }
     }
 }
 
@@ -26,13 +31,13 @@ dependencies {
     val junitVersion = "5.11.4"
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     // 2023 Day 24. I cheated here...
-    testImplementation("com.microsoft.z3:java-jar:4.11.2")
-    testRuntimeOnly("com.microsoft.z3:libz3.java.linux:4.11.2@zip")
-
+    if (importZ3NativeLibs) {
+        testImplementation("com.microsoft.z3:java-jar:4.11.2")
+        testRuntimeOnly("com.microsoft.z3:libz3.java.linux:4.11.2@zip")
+        fileTree("$buildDir/nativeLibs")
+    }
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     implementation(kotlin("stdlib-jdk8"))
-
-    fileTree("$buildDir/nativeLibs")
 }
 
 tasks {
@@ -48,27 +53,30 @@ tasks {
         commandLine("sh", "-c", "${project.rootDir}/scripts/generate-readme.sh")
     }
 
-    register<Copy>("extractZ3NativeLib") {
-        val zipFile =
-            configurations.testRuntimeClasspath
-                .get()
-                .files
-                .first { it.name.contains("libz3\\.java\\.linux-.*\\.zip".toRegex()) }
-        val nativeLibsDir = file("$buildDir/nativeLibs")
+    if (importZ3NativeLibs) {
+        register<Copy>("extractZ3NativeLib") {
+            val zipFile =
+                configurations.testRuntimeClasspath
+                    .get()
+                    .files
+                    .first { it.name.contains("libz3\\.java\\.linux-.*\\.zip".toRegex()) }
+            val nativeLibsDir = file("$buildDir/nativeLibs")
 
-        from(zipTree(zipFile))
-        into(nativeLibsDir)
+            from(zipTree(zipFile))
+            into(nativeLibsDir)
 
-        doLast {
-            println("Extracted Z3 ${zipFile.name} native library to $nativeLibsDir")
+            doLast {
+                println("Extracted Z3 ${zipFile.name} native library to $nativeLibsDir")
+            }
         }
     }
 
     register<Test>("testDay") {
-        dependsOn("extractZ3NativeLib")
-
-        val javaLibraryPath = System.getProperty("java.library.path")
-        systemProperty("java.library.path", "$buildDir/nativeLibs${File.separatorChar}$javaLibraryPath")
+        if (importZ3NativeLibs) {
+            dependsOn("extractZ3NativeLib")
+            val javaLibraryPath = System.getProperty("java.library.path")
+            systemProperty("java.library.path", "$buildDir/nativeLibs${File.separatorChar}$javaLibraryPath")
+        }
 
         group = "advent of code"
         description = "Run the current day's tests"
@@ -90,10 +98,11 @@ tasks {
     }
 
     test {
-        dependsOn("extractZ3NativeLib")
-
-        val javaLibraryPath = System.getProperty("java.library.path")
-        systemProperty("java.library.path", "$buildDir/nativeLibs${File.pathSeparatorChar}$javaLibraryPath")
+        if (importZ3NativeLibs) {
+            dependsOn("extractZ3NativeLib")
+            val javaLibraryPath = System.getProperty("java.library.path")
+            systemProperty("java.library.path", "$buildDir/nativeLibs${File.pathSeparatorChar}$javaLibraryPath")
+        }
 
         useJUnitPlatform()
         testLogging.events =
@@ -115,11 +124,11 @@ tasks {
 
     withType<KotlinCompile> {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_19)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
         java {
-            sourceCompatibility = JavaVersion.VERSION_19
-            targetCompatibility = JavaVersion.VERSION_19
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
         }
     }
 
