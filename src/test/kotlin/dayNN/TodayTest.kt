@@ -46,11 +46,7 @@ class TodayTest : DataFiles {
 class Solver(
     @Suppress("UNUSED_PARAMETER") data: List<String>,
 ) {
-    fun solvePartOne(): Int {
-        return 42
-    }
+    fun solvePartOne(): Int = 42
 
-    fun solvePartTwo(): Int {
-        return 90210
-    }
+    fun solvePartTwo(): Int = 90210
 }

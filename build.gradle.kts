@@ -9,7 +9,7 @@ val importZ3NativeLibs = false
 
 plugins {
     kotlin("jvm") version "2.2.21"
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
+    id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
     kotlin("plugin.serialization") version "2.2.21"
     application
 }
