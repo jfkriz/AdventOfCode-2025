@@ -79,4 +79,12 @@ class ExtensionsTest {
             )
         assertEquals(expected, input.rotateLeft())
     }
+
+    @Test
+    fun `combinations should return 98 as the max for list 987654321111111 size 2`() {
+        val list = listOf(9, 8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1)
+        val combinations = list.asSequence().combinations(2)
+        val results = combinations.map { it[0] * 10 + it[1] }
+        assertEquals(98, results.maxOrNull())
+    }
 }

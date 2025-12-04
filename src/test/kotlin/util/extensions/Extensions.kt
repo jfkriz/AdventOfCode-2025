@@ -51,7 +51,7 @@ infix fun Int.toward(to: Int): IntProgression {
 
 /**
  * Take a list of int ranges and reduce them so that any overlapping segments are removed. This would be the
- * same as creating a [Set] for each range, and then doing a [Set.union] on them. But for really large
+ * same as creating a [Set] for each range, and then doing a union on them. But for really large
  * ranges, like those found on [Day 15 of the 2022 Advent of Code](https://adventofcode.com/2022/day/15). With
  * the resulting list of ranges, you can easily count the number of unique positions represented by each.
  */
@@ -142,7 +142,7 @@ fun <T> Sequence<T>.combinations(size: Int): Sequence<List<T>> =
             for ((i, element) in withIndex()) {
                 val remaining = drop(i + 1)
                 for (combination in remaining.combinations(size - 1)) {
-                    yield(combination + listOf(element))
+                    yield(listOf(element) + combination)
                 }
             }
         } else {
