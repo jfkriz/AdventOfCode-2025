@@ -142,7 +142,7 @@ fun <T> Sequence<T>.combinations(size: Int): Sequence<List<T>> =
             for ((i, element) in withIndex()) {
                 val remaining = drop(i + 1)
                 for (combination in remaining.combinations(size - 1)) {
-                    yield(combination + listOf(element))
+                    yield(listOf(element) + combination)
                 }
             }
         } else {
