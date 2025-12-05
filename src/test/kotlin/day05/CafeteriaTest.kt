@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import util.DataFiles
 import util.extensions.chunked
-import util.extensions.reduceLong
+import util.extensions.reduce
 
 @DisplayName("Day 05 - Cafeteria")
 @TestMethodOrder(OrderAnnotation::class)
@@ -64,7 +64,7 @@ data class CafeteriaDatabase(
             freshIngredientRanges.any { range -> ingredient in range }
         }
 
-    val freshIngredientsCount: Long = freshIngredientRanges.reduceLong().sumOf { it.last - it.first + 1 }
+    val freshIngredientsCount: Long = freshIngredientRanges.reduce().sumOf { it.endInclusive - it.start + 1 }
 
     companion object {
         fun fromInput(input: List<String>): CafeteriaDatabase {

@@ -55,6 +55,7 @@ infix fun Int.toward(to: Int): IntProgression {
  * ranges, like those found on [Day 15 of the 2022 Advent of Code](https://adventofcode.com/2022/day/15). With
  * the resulting list of ranges, you can easily count the number of unique positions represented by each.
  */
+@JvmName("reduceIntRanges")
 fun List<IntRange>.reduce(): List<IntRange> =
     if (this.size <= 1) {
         this
@@ -77,7 +78,8 @@ fun List<IntRange>.reduce(): List<IntRange> =
  * ranges, like those found on [Day 5 of the 2025 Advent of Code](https://adventofcode.com/2025/day/5). With
  * the resulting list of ranges, you can easily count the number of unique positions represented by each.
  */
-fun List<LongRange>.reduceLong(): List<LongRange> =
+@JvmName("reduceLongRanges")
+fun List<LongRange>.reduce(): List<LongRange> =
     if (this.size <= 1) {
         this
     } else {
