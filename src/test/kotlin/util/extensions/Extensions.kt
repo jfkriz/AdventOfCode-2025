@@ -72,6 +72,28 @@ fun List<IntRange>.reduce(): List<IntRange> =
     }
 
 /**
+ * Take a list of long ranges and reduce them so that any overlapping segments are removed. This would be the
+ * same as creating a [Set] for each range, and then doing a union on them. But for really large
+ * ranges, like those found on [Day 5 of the 2025 Advent of Code](https://adventofcode.com/2025/day/5). With
+ * the resulting list of ranges, you can easily count the number of unique positions represented by each.
+ */
+fun List<LongRange>.reduceLong(): List<LongRange> =
+    if (this.size <= 1) {
+        this
+    } else {
+        val sorted = this.sortedBy { it.first }
+        sorted.drop(1).fold(mutableListOf(sorted.first())) { reduced, range ->
+            val lastRange = reduced.last()
+            if (range.first <= lastRange.last) {
+                reduced[reduced.lastIndex] = (lastRange.first..maxOf(lastRange.last, range.last))
+            } else {
+                reduced.add(range)
+            }
+            reduced
+        }
+    }
+
+/**
  * Replace the last occurrence of [oldValue] with [newValue] in the string. This was originally added for
  * [Day 1 of the 2023 Advent of Code](https://adventofcode.com/2023/day/1), so we could easily find the last
  * occurrence of a number word (like "one") in a string, and replace it with the numeric value ("1").
