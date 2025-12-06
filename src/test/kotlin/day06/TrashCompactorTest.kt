@@ -98,8 +98,8 @@ data class WorksheetEntry(
         fun fromCephalopodNumbers(entryStrings: List<String>): WorksheetEntry {
             val numbers =
                 entryStrings
-                    .map { it.replace('+', ' ').replace('*', ' ') }
-                    .map { it.trim().toLong() }
+                    .map { it.replace("\\D+".toRegex(), "") }
+                    .map { it.toLong() }
             val operation = entryStrings.last().last()
             return WorksheetEntry(numbers, operation)
         }
