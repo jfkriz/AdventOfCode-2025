@@ -55,7 +55,31 @@ infix fun Int.toward(to: Int): IntProgression {
  * ranges, like those found on [Day 15 of the 2022 Advent of Code](https://adventofcode.com/2022/day/15). With
  * the resulting list of ranges, you can easily count the number of unique positions represented by each.
  */
+@JvmName("reduceIntRanges")
 fun List<IntRange>.reduce(): List<IntRange> =
+    if (this.size <= 1) {
+        this
+    } else {
+        val sorted = this.sortedBy { it.first }
+        sorted.drop(1).fold(mutableListOf(sorted.first())) { reduced, range ->
+            val lastRange = reduced.last()
+            if (range.first <= lastRange.last) {
+                reduced[reduced.lastIndex] = (lastRange.first..maxOf(lastRange.last, range.last))
+            } else {
+                reduced.add(range)
+            }
+            reduced
+        }
+    }
+
+/**
+ * Take a list of long ranges and reduce them so that any overlapping segments are removed. This would be the
+ * same as creating a [Set] for each range, and then doing a union on them. But for really large
+ * ranges, like those found on [Day 5 of the 2025 Advent of Code](https://adventofcode.com/2025/day/5). With
+ * the resulting list of ranges, you can easily count the number of unique positions represented by each.
+ */
+@JvmName("reduceLongRanges")
+fun List<LongRange>.reduce(): List<LongRange> =
     if (this.size <= 1) {
         this
     } else {
