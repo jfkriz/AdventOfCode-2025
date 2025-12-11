@@ -5,7 +5,10 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 // Set to true to import Z3 native libraries for Day 24 of 2023 (or any others that may need it)
-val importZ3NativeLibs = false
+// 2025, Day 10, part 2 used Z3
+val importZ3NativeLibs = true
+// Set to true to import Choco Solver for constraint solving (tried for 2025, day 10, part 2, but used Z3 instead)
+val importChocoSolver = false
 
 plugins {
     kotlin("jvm") version "2.2.21"
@@ -37,6 +40,9 @@ dependencies {
         testImplementation("com.microsoft.z3:java-jar:4.11.2")
         testRuntimeOnly("com.microsoft.z3:libz3.java.linux:4.11.2@zip")
         fileTree("$buildDir/nativeLibs")
+    }
+    if (importChocoSolver) {
+        implementation("org.choco-solver:choco-solver:4.10.14")
     }
     implementation(kotlin("stdlib-jdk8"))
 }
