@@ -42,7 +42,7 @@ dependencies {
         fileTree("$buildDir/nativeLibs")
     }
     if (importChocoSolver) {
-        implementation("org.choco-solver:choco-solver:4.10.14")
+        implementation("org.choco-solver:choco-solver:4.10.18")
     }
     implementation(kotlin("stdlib-jdk8"))
 }
