@@ -11,7 +11,7 @@ val importZ3NativeLibs = true
 val importChocoSolver = false
 
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.3.0"
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
     kotlin("plugin.serialization") version "2.2.21"
     application
